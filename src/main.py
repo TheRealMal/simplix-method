@@ -40,7 +40,8 @@ class Simplix:
         for i in range(1, len(self.simplix_table) - 1):
             if self.simplix_table[i][1] < 0:
                 perm_col = self.simplix_perm_col(i)
-                perm_row = self.simplix_perm_row(perm_col)
+                perm_row = self.simplix_perm_row(self.simplix_table[i][perm_col])
+                print(perm_row, perm_col)
                 break
 
     def simplix_perm_col(self, row_index: int) -> int:
@@ -49,7 +50,7 @@ class Simplix:
                 return i
             
     def simplix_perm_row(self, el: int, first_iter: bool = True) -> int:
-        min_value, min_index = self.simplix_table[1][1] / el, 1
+        min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
             value = self.simplix_table[i][1] / el
             if value < min_value and ((value > 0 and first_iter) or (value >= 0 and not first_iter)):
