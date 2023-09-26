@@ -63,7 +63,7 @@ class Simplix:
             if self.simplix_table[i][1] < 0:
                 perm_col = self._simplix_perm_col(i)
                 perm_row = self._simplix_perm_row(self.simplix_table[i][perm_col], self.iterations == 0)
-                print("Итерация #{} | Разрешающая строка: {} | Разрешающий столбец: {}".format(self.iterations, perm_row, perm_col))
+                self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
                 self.iterations += 1
                 return False
@@ -74,7 +74,7 @@ class Simplix:
             if self.simplix_table[-1][i] > 0:
                 perm_col = i
                 perm_row = self._find_min_free_rel(self.simplix_table[-1][i])
-                print("Итерация #{} | Разрешающая строка: {} | Разрешающий столбец: {}".format(self.iterations, perm_row, perm_col))
+                self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
                 self.iterations += 1
                 return False
