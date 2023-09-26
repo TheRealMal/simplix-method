@@ -16,11 +16,11 @@ class Simplix:
         table = [[" ", "Sjo"]]
         # Fill first line
         for i in range(len(self.free_vars)):
-            table[0].append("X{}".format(self.free_vars[i]))
+            table[0].append(self.free_vars[i])
         # Fill every line
         # If coeff within i'th X < 0 -> inverse line
         for i in range(len(self.basis_vars)):
-            table.append(["X{}".format(self.basis_vars[i])])
+            table.append([self.basis_vars[i]])
             table[i + 1].append(
                 self.A[i][-1] if self.A[i][self.basis_vars[i]] > 0 else -self.A[i][-1]
                 )
@@ -39,14 +39,33 @@ class Simplix:
     def simplix_check(self) -> None:
         for i in range(1, len(self.simplix_table) - 1):
             if self.simplix_table[i][1] < 0:
-                self.simplix_step()
+                perm_col = self.simplix_perm_col(i)
+                perm_row = self.simplix_perm_row(perm_col)
+                break
 
-    def simplix_step(self) -> None:
-        # TODO
-        pass
-    
+    def simplix_perm_col(self, row_index: int) -> int:
+        for i in range(2, len(self.simplix_table[row_index])):
+            if self.simplix_table[row_index][i] < 0:
+                return i
+            
+    def simplix_perm_row(self, el: int, first_iter: bool = True) -> int:
+        min_value, min_index = self.simplix_table[1][1] / el, 1
+        for i in range(1, len(self.simplix_table) - 1):
+            value = self.simplix_table[i][1] / el
+            if value < min_value and ((value > 0 and first_iter) or (value >= 0 and not first_iter)):
+                min_value, min_index = value, i
+        return min_index
+
+
     def print(self) -> None:
-        s = [[str(e) for e in row] for row in self.simplix_table]
+        s = []
+        for i in range(len(self.simplix_table)):
+            s.append([])
+            for j in range(len(self.simplix_table[i])):
+                if (i == 0 or j == 0) and type(self.simplix_table[i][j]) == int:
+                    s[i].append("X{}".format(self.simplix_table[i][j]))
+                else:
+                    s[i].append(str(self.simplix_table[i][j]))
         lens = [max(map(len, col)) for col in zip(*s)]
         fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
         table = [fmt.format(*row) for row in s]
@@ -77,6 +96,7 @@ def main() -> None:
         A=A
     )
     data.print()
+    data.simplix_check()
 
 if __name__ == "__main__":
     main()
