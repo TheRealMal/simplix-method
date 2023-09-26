@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from fractions import Fraction
+import pandas as pd
 
 class Simplix:
     def __init__(self, F: list[int], A: list[list[int]]) -> None:
@@ -124,7 +126,6 @@ class Simplix:
         print("Итерация #{} | Разрешающая строка: {} | Разрешающий столбец: {}".format(self.iterations, perm_row, perm_col))
 
     def print(self) -> None:
-        import pandas as pd
         matrix = []
         for i in range(len(self.simplix_table)):
             matrix.append([])
