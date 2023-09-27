@@ -6,10 +6,9 @@ class Simplix:
     def __init__(self, F: list[int], A: list[list[int]]) -> None:
         self.F = F
         self.A = A
-        self.basis_vars = self._set_basis()
-        self.free_vars = self._set_free()
         self.simplix_table = self._simplix_table_init()
         self.iterations = 0
+        self._last_switched = (-1, -1)
 
     def _set_basis(self) -> list[int]:
         def basis_loop(line: list[int]) -> int:
@@ -23,42 +22,60 @@ class Simplix:
             )
         return arr
     
-    def _set_free(self) -> list[int]:
+    def _set_free(self, basis_vars: list[int]) -> list[int]:
         arr = []
         for i in range(1, len(self.F) - 1):
-            if i not in self.basis_vars:
+            if i not in basis_vars:
                 arr.append(i)
         return arr
 
     def _simplix_table_init(self) -> list[list]:
+        basis_vars = self._set_basis()
+        free_vars = self._set_free(basis_vars)
         table = [[" ", "Sjo"]]
         # Fill first line
-        for i in range(len(self.free_vars)):
-            table[0].append(self.free_vars[i])
+        for i in range(len(free_vars)):
+            table[0].append(free_vars[i])
         # Fill every line
         # If coeff within i'th X < 0 -> inverse line
-        for i in range(len(self.basis_vars)):
-            table.append([self.basis_vars[i]])
+        for i in range(len(basis_vars)):
+            table.append([basis_vars[i]])
             table[i + 1].append(
-                Fraction(self.A[i][-1]) if self.A[i][self.basis_vars[i]] > 0 else Fraction(-self.A[i][-1])
+                Fraction(self.A[i][-1]) if self.A[i][basis_vars[i]] > 0 else Fraction(-self.A[i][-1])
                 )
             for j in range(1, len(self.A[i]) - 1):
-                if j not in self.basis_vars:
-                    if self.A[i][self.basis_vars[i]] < 0:
+                if j not in basis_vars:
+                    if self.A[i][basis_vars[i]] < 0:
                         self.A[i][j] = -self.A[i][j]
                     table[i + 1].append(Fraction(self.A[i][j]))
         # Fill last line (inverse all values)
         table.append(["F"])
         for i in range(len(self.F)):
-            if i not in self.basis_vars:
+            if i not in basis_vars:
                 table[-1].append(Fraction(-self.F[i]))
         return table
     
+    def print(self) -> None:
+        matrix = []
+        for i in range(len(self.simplix_table)):
+            matrix.append([])
+            for j in range(len(self.simplix_table[i])):
+                if (i == 0 or j == 0) and type(self.simplix_table[i][j]) == int:
+                    matrix[i].append("X{}".format(self.simplix_table[i][j]))
+                else:
+                    matrix[i].append(str(self.simplix_table[i][j]))
+        if self._last_switched[0] > 0 and self._last_switched[1] > 0:
+            matrix[self._last_switched[0]][0] = matrix[self._last_switched[0]][0].replace("X", "*X")
+            matrix[0][self._last_switched[1]] = matrix[0][self._last_switched[1]].replace("X", "*X")
+        df = pd.DataFrame(matrix, columns=None)
+        print(df.to_string(index=0, header=0))
+
     def solve(self) -> None:
         while not self._simplix_check():
             self.print()
         while not self._simplix_check_second():
             self.print()
+        self._print_result()
 
     def _simplix_check(self) -> bool:
         for i in range(1, len(self.simplix_table) - 1):
@@ -67,6 +84,7 @@ class Simplix:
                 perm_row = self._simplix_perm_row(self.simplix_table[i][perm_col], self.iterations == 0)
                 self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
+                self._last_switched = (perm_row, perm_col)
                 self.iterations += 1
                 return False
         return True
@@ -78,12 +96,38 @@ class Simplix:
                 perm_row = self._find_min_free_rel(self.simplix_table[-1][i])
                 self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
+                self._last_switched = (perm_row, perm_col)
                 self.iterations += 1
                 return False
         return True
     
+    def _print_result(self) -> None:
+        result = "#----- Optimal solution & target F -----#\n"
+        # Add free variables to result string
+        tmp = []
+        for i in range(2, len(self.simplix_table[0])):
+            tmp.append("X{}".format(str(self.simplix_table[0][i])))
+        tmp.append("0")
+        result += " = ".join(tmp) + "\n"
+
+        # Add basis variables to result string
+        for i in range(1, len(self.simplix_table) - 1):
+            result += "X{} = {}{}".format(
+                self.simplix_table[i][0],
+                self.simplix_table[i][1],
+                ", " if i != len(self.simplix_table) - 2 else "\n"
+            )
+            
+        # Add F = ...
+        result += "{} = {}".format(
+            self.simplix_table[-1][0],
+            self.simplix_table[-1][1],
+        )
+        result += "\n#---------------------------------------#"
+        print(result)
+    
     def _find_min_free_rel(self, el: int) -> int:
-        min_value, min_index = 10**10, 0
+        min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
             value = self.simplix_table[i][1] / el
             if value < min_value and value > 0:
@@ -123,18 +167,4 @@ class Simplix:
         return min_index
 
     def _log_state(self, perm_row: int, perm_col: int) -> None:
-        print("Итерация #{} | Разрешающая строка: {} | Разрешающий столбец: {}".format(self.iterations, perm_row, perm_col))
-
-    def print(self) -> None:
-        matrix = []
-        for i in range(len(self.simplix_table)):
-            matrix.append([])
-            for j in range(len(self.simplix_table[i])):
-                if (i == 0 or j == 0) and type(self.simplix_table[i][j]) == int:
-                    matrix[i].append("X{}".format(self.simplix_table[i][j]))
-                elif type(self.simplix_table[i][j]) == float:
-                    matrix[i].append(self.simplix_table[i][j])
-                else:
-                    matrix[i].append(str(self.simplix_table[i][j]))
-        df = pd.DataFrame(matrix, columns=None)
-        print(df.to_string(index=0, header=0))
+        print("Итерация #{} | Разрешающая строка: {} | Разрешающий столбец: {}".format(self.iterations + 1, perm_row, perm_col))
