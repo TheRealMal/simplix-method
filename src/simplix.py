@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2023, Roman Malyutin
 from fractions import Fraction
-import tabulate
+from tabulate import tabulate
 
 class Simplix:
     def __init__(self, F: list[int], A: list[list[int]]) -> None:
@@ -65,7 +65,7 @@ class Simplix:
                     matrix[i].append("X{}".format(self.simplix_table[i][j]))
                 else:
                     matrix[i].append(str(self.simplix_table[i][j]))
-        matrix = list(tabulate.tabulate(matrix, tablefmt='simple_grid', stralign='right', showindex=False))
+        matrix = list(tabulate(matrix, tablefmt='simple_grid', stralign='right', showindex=False))
         if self._last_switched[0] > 0 and self._last_switched[1] > 0:
             self._bold_row_col(matrix)
         for i in range(len(matrix)):
