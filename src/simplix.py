@@ -43,7 +43,7 @@ class Simplix:
             table.append([basis_vars[i]])
             table[i + 1].append(
                 Fraction(self.A[i][-1]) if self.A[i][basis_vars[i]] > 0 else Fraction(-self.A[i][-1])
-                )
+            )
             for j in range(1, len(self.A[i]) - 1):
                 if j not in basis_vars:
                     if self.A[i][basis_vars[i]] < 0:
@@ -65,29 +65,15 @@ class Simplix:
                     matrix[i].append("X{}".format(self.simplix_table[i][j]))
                 else:
                     matrix[i].append(str(self.simplix_table[i][j]))
-        if self._last_switched[0] > 0 and self._last_switched[1] > 0:
-            matrix[self._last_switched[0]][0] = matrix[self._last_switched[0]][0].replace("X", "*X")
-            matrix[0][self._last_switched[1]] = matrix[0][self._last_switched[1]].replace("X", "*X")
         matrix = list(tabulate.tabulate(matrix, tablefmt='simple_grid', stralign='right', showindex=False))
         if self._last_switched[0] > 0 and self._last_switched[1] > 0:
             self._bold_row_col(matrix)
-        for ch in matrix:
-            print(ch, end="")
-        print()
+        for i in range(len(matrix)):
+            print(matrix[i], end='\n' if i == len(matrix) -1 else '')
                 
     def _bold_row_col(self, matrix: list) -> None:
         current_row, current_col = 0, 0
-        tmp = {
-            '├': '┣',
-            '─': '━',
-            '┼': '╋',
-            '┤': '┫',
-            '│': '┃',
-            '┐': '┓',
-            '┘': '┛',
-            '┬': '┳',
-            '┴': '┻'
-        }
+        tmp = {'├': '┣', '─': '━', '┼': '╋', '┤': '┫', '│': '┃', '┐': '┓', '┘': '┛', '┬': '┳', '┴': '┻'}
         for i in range(len(matrix)):
             if matrix[i] == '\n':
                 current_row += 1
