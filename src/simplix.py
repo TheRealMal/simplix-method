@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2023, Roman Malyutin
 from fractions import Fraction
-import pandas as pd
+import tabulate
 
 class Simplix:
     def __init__(self, F: list[int], A: list[list[int]]) -> None:
@@ -68,8 +68,36 @@ class Simplix:
         if self._last_switched[0] > 0 and self._last_switched[1] > 0:
             matrix[self._last_switched[0]][0] = matrix[self._last_switched[0]][0].replace("X", "*X")
             matrix[0][self._last_switched[1]] = matrix[0][self._last_switched[1]].replace("X", "*X")
-        df = pd.DataFrame(matrix, columns=None)
-        print(df.to_string(index=0, header=0))
+        matrix = list(tabulate.tabulate(matrix, tablefmt='simple_grid', stralign='right', showindex=False))
+        if self._last_switched[0] > 0 and self._last_switched[1] > 0:
+            self._bold_row_col(matrix)
+        for ch in matrix:
+            print(ch, end="")
+        print()
+                
+    def _bold_row_col(self, matrix: list) -> None:
+        current_row, current_col = 0, 0
+        tmp = {
+            '├': '┣',
+            '─': '━',
+            '┼': '╋',
+            '┤': '┫',
+            '│': '┃',
+            '┐': '┓',
+            '┘': '┛',
+            '┬': '┳',
+            '┴': '┻'
+        }
+        for i in range(len(matrix)):
+            if matrix[i] == '\n':
+                current_row += 1
+                current_col = 0
+            elif current_row in (self._last_switched[0] * 2, self._last_switched[0] * 2 + 1, self._last_switched[0] * 2 + 2):
+                matrix[i] = tmp.get(matrix[i], matrix[i])
+            if matrix[i] in ("┬", "│", "┼", "┴", "┐" "┘") and matrix[i - 1] != '\n':
+                current_col += 1
+            if current_col == self._last_switched[1] or (current_col == self._last_switched[1] + 1 and matrix[i] not in ('─', '┘', '┤', '┐')):
+                matrix[i] = tmp.get(matrix[i], matrix[i])
 
     def solve(self) -> None:
         while not self._simplix_check():
