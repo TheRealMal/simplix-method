@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2023, Roman Malyutin
 from fractions import Fraction
 import pandas as pd
 
