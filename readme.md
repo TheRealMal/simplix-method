@@ -39,11 +39,16 @@ a_{m1} & a_{m2} & \dots  & a_{m(n+m)} & b_m    \\
 ## Конфигурация src/config.py
 - В переменную F вводим коэффиценты при $x$ в целевой функции.
 - В переменную A вводим матрицу коэффицентов при $x$ СЛАУ и вектор правой части системы ограничений так, чтобы он являлся последним столбцом матрицы (см. выше).
-## Запуск
+## Команды
 ```console
-python3 src/main.py
-```
-## Тесты
-```console
+# Установка
+git clone https://github.com/TheRealMal/simplix-method.git
+cd simplix-method
+pip install -r requirements.txt
+
+# Тесты
 pytest
+
+# Запуск
+python3 src/main.py
 ```
