@@ -13,8 +13,8 @@ class Simplix:
 
     def _set_basis(self) -> list[int]:
         def basis_loop(line: list[int]) -> int:
-            for i in range(len(line) - 2, 0, -1):
-                if line[i] != 0: return i
+            for i in range(len(line) - 2, -1, -1):
+                if line[i] != 0: return i + 1
         
         arr = []
         for i in range(len(self.A)):
@@ -25,9 +25,9 @@ class Simplix:
     
     def _set_free(self, basis_vars: list[int]) -> list[int]:
         arr = []
-        for i in range(1, len(self.F) - 1):
-            if i not in basis_vars:
-                arr.append(i)
+        for i in range(len(self.F) - 1):
+            if i + 1 not in basis_vars:
+                arr.append(i + 1)
         return arr
 
     def _simplix_table_init(self) -> list[list]:
@@ -42,11 +42,11 @@ class Simplix:
         for i in range(len(basis_vars)):
             table.append([basis_vars[i]])
             table[i + 1].append(
-                Fraction(self.A[i][-1]) if self.A[i][basis_vars[i]] > 0 else Fraction(-self.A[i][-1])
+                Fraction(self.A[i][-1]) if self.A[i][basis_vars[i] - 1] > 0 else Fraction(-self.A[i][-1])
             )
-            for j in range(1, len(self.A[i]) - 1):
-                if j not in basis_vars:
-                    if self.A[i][basis_vars[i]] < 0:
+            for j in range(len(self.A[i]) - 1):
+                if j + 1 not in basis_vars:
+                    if self.A[i][basis_vars[i] - 1] < 0:
                         self.A[i][j] = -self.A[i][j]
                     table[i + 1].append(Fraction(self.A[i][j]))
         # Fill last line (inverse all values)
@@ -134,7 +134,7 @@ class Simplix:
             )
             
         # Add F = ...
-        result += "{} = {}".format(
+        result += "{} = {} (min)".format(
             self.simplix_table[-1][0],
             self.simplix_table[-1][1],
         )
