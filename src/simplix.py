@@ -90,11 +90,14 @@ class Simplix:
                 matrix[i] = tmp.get(matrix[i], matrix[i])
 
     def solve(self, output: Optional[list] = None) -> None:
-        while not self._simplix_check():
+        while self.iterations < 100 and not self._simplix_check():
             self.print(output)
-        while not self._simplix_check_second():
+        while self.iterations < 100 and not self._simplix_check_second():
             self.print(output)
-        self._print_result(output)
+        if self.iterations != 100:
+            self._print_result(output)
+        else:
+            print("Infinite loop")
 
     def _simplix_check(self) -> bool:
         for i in range(1, len(self.simplix_table) - 1):

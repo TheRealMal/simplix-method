@@ -22,6 +22,9 @@ def solve_simplix(message) -> None:
     )
     data.print(output)
     data.solve(output)
-    bot.send_message(message.chat.id, "<pre>" + "".join(output) + "</pre>")
+    if data.iterations == 100:
+        bot.send_message(message.chat.id, "<pre>Бесконечный цикл</pre>")
+    else:
+        bot.send_message(message.chat.id, "<pre>" + "".join(output) + "</pre>")
 
 bot.infinity_polling()
