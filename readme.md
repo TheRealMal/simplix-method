@@ -54,4 +54,8 @@ pytest
 
 # Запуск
 python3 src/main.py
+
+# Запуск телеграм бота 
+# В директории src создать файл bot_token.py и в нем создать переменную bot_token = "ВАШ_ТОКЕН"
+python3 src/bot.py
 ```

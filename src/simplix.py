@@ -2,6 +2,7 @@
 # Copyright (c) 2023, Roman Malyutin
 from fractions import Fraction
 from tabulate import tabulate
+from typing import Optional
 
 class Simplix:
     def __init__(self, F: list[int], A: list[list[int]]) -> None:
@@ -56,7 +57,7 @@ class Simplix:
                 table[-1].append(Fraction(-self.F[i]))
         return table
     
-    def print(self) -> None:
+    def print(self, output: Optional[list] = None) -> None:
         matrix = []
         for i in range(len(self.simplix_table)):
             matrix.append([])
@@ -69,6 +70,9 @@ class Simplix:
         if self._last_switched[0] > 0 and self._last_switched[1] > 0:
             self._bold_row_col(matrix)
         for i in range(len(matrix)):
+            if output != None:
+                output.append(matrix[i])
+                output.append('\n' if i == len(matrix) -1 else '')
             print(matrix[i], end='\n' if i == len(matrix) -1 else '')
                 
     def _bold_row_col(self, matrix: list) -> None:
@@ -85,12 +89,12 @@ class Simplix:
             if current_col == self._last_switched[1] or (current_col == self._last_switched[1] + 1 and matrix[i] not in ('─', '┘', '┤', '┐')):
                 matrix[i] = tmp.get(matrix[i], matrix[i])
 
-    def solve(self) -> None:
+    def solve(self, output: Optional[list] = None) -> None:
         while not self._simplix_check():
-            self.print()
+            self.print(output)
         while not self._simplix_check_second():
-            self.print()
-        self._print_result()
+            self.print(output)
+        self._print_result(output)
 
     def _simplix_check(self) -> bool:
         for i in range(1, len(self.simplix_table) - 1):
@@ -108,7 +112,7 @@ class Simplix:
         for i in range(2, len(self.simplix_table[-1])):
             if self.simplix_table[-1][i] > 0:
                 perm_col = i
-                perm_row = self._find_min_free_rel(self.simplix_table[-1][i])
+                perm_row = self._find_min_free_rel(i)
                 self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
                 self._last_switched = (perm_row, perm_col)
@@ -116,7 +120,7 @@ class Simplix:
                 return False
         return True
     
-    def _print_result(self) -> None:
+    def _print_result(self, output: Optional[list] = None) -> None:
         result = "#----- Optimal solution & target F -----#\n"
         # Add free variables to result string
         tmp = []
@@ -139,12 +143,14 @@ class Simplix:
             self.simplix_table[-1][1],
         )
         result += "\n#---------------------------------------#"
+        if output != None:
+            output.append(result)
         print(result)
     
-    def _find_min_free_rel(self, el: int) -> int:
+    def _find_min_free_rel(self, col: int) -> int:
         min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
-            value = self.simplix_table[i][1] / el
+            value = self.simplix_table[i][1] / self.simplix_table[i][col]
             if value < min_value and value > 0:
                 min_value, min_index = value, i
         return min_index
