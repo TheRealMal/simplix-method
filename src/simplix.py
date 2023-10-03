@@ -43,13 +43,11 @@ class Simplix:
         for i in range(len(basis_vars)):
             table.append([basis_vars[i]])
             table[i + 1].append(
-                Fraction(self.A[i][-1]) if self.A[i][basis_vars[i] - 1] > 0 else Fraction(-self.A[i][-1])
+                Fraction(self.A[i][-1], self.A[i][basis_vars[i] - 1])
             )
             for j in range(len(self.A[i]) - 1):
                 if j + 1 not in basis_vars:
-                    if self.A[i][basis_vars[i] - 1] < 0:
-                        self.A[i][j] = -self.A[i][j]
-                    table[i + 1].append(Fraction(self.A[i][j]))
+                    table[i + 1].append(Fraction(self.A[i][j], self.A[i][basis_vars[i] - 1]))
         # Fill last line (inverse all values)
         table.append(["F"])
         for i in range(len(self.F)):
