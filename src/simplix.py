@@ -103,7 +103,7 @@ class Simplix:
         for i in range(1, len(self.simplix_table) - 1):
             if self.simplix_table[i][1] < 0:
                 perm_col = self._simplix_perm_col(i)
-                perm_row = self._simplix_perm_row(self.simplix_table[i][perm_col], self.iterations == 0)
+                perm_row = self._simplix_perm_row(perm_col, self.iterations == 0)
                 self._log_state(perm_row, perm_col)
                 self._simplix_step(perm_col, perm_row)
                 self._last_switched = (perm_row, perm_col)
@@ -182,10 +182,10 @@ class Simplix:
             if self.simplix_table[row_index][i] < 0:
                 return i
             
-    def _simplix_perm_row(self, el: int, first_iter: bool = True) -> int:
+    def _simplix_perm_row(self, col: int, first_iter: bool = True) -> int:
         min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
-            value = self.simplix_table[i][1] / el
+            value = self.simplix_table[i][1] / self.simplix_table[i][col]
             if value < min_value and ((value > 0 and first_iter) or (value >= 0 and not first_iter)):
                 min_value, min_index = value, i
         return min_index
