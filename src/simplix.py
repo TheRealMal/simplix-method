@@ -151,9 +151,10 @@ class Simplix:
     def _find_min_free_rel(self, col: int) -> int:
         min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
-            value = self.simplix_table[i][1] / self.simplix_table[i][col]
-            if value < min_value and value > 0:
-                min_value, min_index = value, i
+            if self.simplix_table[i][col] != 0:
+                value = self.simplix_table[i][1] / self.simplix_table[i][col]
+                if value < min_value and value > 0:
+                    min_value, min_index = value, i
         return min_index
         
     def _simplix_step(self, perm_col: int, perm_row: int) -> None:
@@ -183,9 +184,10 @@ class Simplix:
     def _simplix_perm_row(self, col: int, first_iter: bool = True) -> int:
         min_value, min_index = 10**10, 1
         for i in range(1, len(self.simplix_table) - 1):
-            value = self.simplix_table[i][1] / self.simplix_table[i][col]
-            if value < min_value and ((value > 0 and first_iter) or (value >= 0 and not first_iter)):
-                min_value, min_index = value, i
+            if self.simplix_table[i][col] != 0:
+                value = self.simplix_table[i][1] / self.simplix_table[i][col]
+                if value < min_value and ((value > 0 and first_iter) or (value >= 0 and not first_iter)):
+                    min_value, min_index = value, i
         return min_index
 
     def _log_state(self, perm_row: int, perm_col: int) -> None:
