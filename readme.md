@@ -22,7 +22,7 @@ a_{m1}x_1 + a_{m2}x_2 + \dots + a_{m(n+m)}x_{n+m} = b_m
 Соответственно **F** выглядит так
 ```math
 \begin{pmatrix}
-c_1 & c_2 & \dots & c_{n+m}
+0 & c_1 & c_2 & \dots & c_{n+m}
 \end{pmatrix}
 ```
 и **A** выглядит так
